@@ -1,0 +1,1877 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>财务人AI速查手册</title>
+<style>
+  :root {
+    --bg: #f0f2f5;
+    --card: #ffffff;
+    --sidebar: #ffffff;
+    --text: #1f2937;
+    --text-sub: #6b7280;
+    --primary: #1e40af;
+    --primary-soft: #eff6ff;
+    --border: #e5e7eb;
+    --accent: #0f766e;
+    --warn-bg: #fffbeb;
+    --warn-border: #fde68a;
+    --warn-text: #92400e;
+    --radius: 12px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: -apple-system, "PingFang SC", "Microsoft YaHei", "Segoe UI", sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    font-size: 15px;
+  }
+  .layout { display: flex; min-height: 100vh; }
+
+  /* 侧边栏 */
+  .sidebar {
+    width: 320px;
+    background: var(--sidebar);
+    border-right: 1px solid var(--border);
+    position: fixed;
+    top: 0; left: 0; bottom: 0;
+    overflow-y: auto;
+    padding: 20px 14px;
+    z-index: 10;
+  }
+  .brand {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--primary);
+    padding: 6px 10px 16px;
+    letter-spacing: .5px;
+  }
+  .brand small { display: block; font-size: 12px; color: var(--text-sub); font-weight: 400; margin-top: 4px; }
+  .sidebar nav a {
+    display: block;
+    padding: 9px 12px;
+    margin: 2px 0;
+    color: var(--text);
+    text-decoration: none;
+    border-radius: 8px;
+    font-size: 14px;
+    border-left: 3px solid transparent;
+    transition: .15s;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .sidebar nav a:hover { background: var(--primary-soft); color: var(--primary); }
+  .sidebar nav a.active { background: var(--primary-soft); color: var(--primary); border-left-color: var(--primary); font-weight: 600; }
+  .sidebar nav a.sub {
+    padding: 5px 12px 5px 28px;
+    font-size: 12.5px;
+    color: var(--text-sub);
+    border-left: none;
+    margin: 0;
+  }
+  .sidebar nav a.sub:hover { background: transparent; color: var(--primary); }
+  .sidebar .group-label {
+    font-size: 11px; color: var(--text-sub); text-transform: uppercase;
+    letter-spacing: 1px; padding: 18px 12px 6px;
+  }
+  .reset-btn {
+    display: block;
+    width: 100%;
+    margin: 2px 0 10px;
+    padding: 8px 10px;
+    border: 1px dashed var(--border);
+    background: transparent;
+    color: var(--text-sub);
+    border-radius: 8px;
+    font-size: 12px;
+    cursor: pointer;
+    transition: .15s;
+  }
+  .reset-btn:hover { color: #dc2626; border-color: #dc2626; }
+
+  /* 主内容 */
+  .main { flex: 1; margin-left: 320px; padding: 32px 40px 80px; max-width: 1080px; }
+  .page-header { margin-bottom: 28px; }
+  .page-header h1 { font-size: 26px; font-weight: 700; color: var(--text); }
+  .page-header p { color: var(--text-sub); margin-top: 6px; font-size: 14px; }
+
+  section.module { margin-bottom: 44px; scroll-margin-top: 20px; }
+  .module-head {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 22px 24px;
+    margin-bottom: 16px;
+  }
+  .module-head .num {
+    display: inline-block; font-size: 12px; font-weight: 700;
+    color: var(--primary); background: var(--primary-soft);
+    padding: 3px 10px; border-radius: 20px; margin-bottom: 8px;
+  }
+  .module-head h2 { font-size: 20px; font-weight: 700; }
+  .module-head .lead { color: var(--text-sub); margin-top: 6px; font-size: 14px; }
+  .module-head .source {
+    margin-top: 12px; font-size: 13px; color: var(--text-sub);
+    background: var(--primary-soft); border-radius: 8px; padding: 10px 14px;
+  }
+  .module-head .source b { color: var(--primary); }
+
+  /* 功能卡 */
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px 24px;
+    margin-bottom: 14px;
+    position: relative;
+  }
+  .card h3 { font-size: 16px; font-weight: 700; margin-bottom: 4px; padding-right: 100px; }
+  .card-tools {
+    position: absolute;
+    top: 14px;
+    right: 16px;
+    display: flex;
+    gap: 6px;
+    opacity: 0;
+    transition: opacity .15s;
+  }
+  .card:hover .card-tools { opacity: 1; }
+  .card-tools button {
+    border: 1px solid var(--border);
+    background: #fff;
+    color: var(--text-sub);
+    border-radius: 6px;
+    padding: 3px 10px;
+    font-size: 12px;
+    cursor: pointer;
+    transition: .15s;
+  }
+  .card-tools button:hover { border-color: var(--primary); color: var(--primary); }
+  .card-tools button.pinned { border-color: var(--primary); color: var(--primary); background: var(--primary-soft); }
+  .card-tools button.del:hover { border-color: #dc2626; color: #dc2626; }
+  .card .desc { color: var(--text-sub); font-size: 14px; margin-bottom: 14px; }
+  .prompt-box {
+    display: flex; align-items: stretch; gap: 0;
+    border: 1px solid var(--border); border-radius: 8px; overflow: hidden;
+    background: #fafbfc; margin-bottom: 12px;
+  }
+  .prompt-box code {
+    flex: 1; padding: 12px 14px; font-family: "SFMono-Regular", Consolas, "Courier New", monospace;
+    font-size: 13px; color: #334155; white-space: pre-wrap; word-break: break-all;
+  }
+  .copy-btn {
+    border: none; background: var(--primary); color: #fff;
+    padding: 0 18px; cursor: pointer; font-size: 13px; font-weight: 600;
+    white-space: nowrap; transition: .15s;
+  }
+  .copy-btn:hover { background: #1d4ed8; }
+  .copy-btn.done { background: var(--accent); }
+  .info-row { display: flex; flex-wrap: wrap; gap: 8px 22px; font-size: 13px; color: var(--text-sub); }
+  .info-row span b { color: var(--text); font-weight: 600; }
+  .note {
+    margin-top: 12px; font-size: 13px; color: var(--warn-text);
+    background: var(--warn-bg); border: 1px solid var(--warn-border);
+    border-radius: 8px; padding: 9px 12px;
+  }
+
+  /* 使用说明卡片 */
+  .overview-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  @media (max-width: 760px) { .overview-grid { grid-template-columns: 1fr; } .sidebar { display: none; } .main { margin-left: 0; } }
+  .ov-card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 18px 20px; }
+  .ov-card h3 { font-size: 15px; font-weight: 700; margin-bottom: 8px; color: var(--primary); }
+  .ov-card ul { padding-left: 18px; color: var(--text-sub); font-size: 13.5px; }
+  .ov-card li { margin: 4px 0; }
+  .ov-card b { color: var(--text); }
+  .footer { text-align: center; color: var(--text-sub); font-size: 12px; margin-top: 30px; }
+  .disclaimer {
+    background: #fff7ed; border: 1px solid #fcd34d; border-left: 4px solid #d97706;
+    border-radius: 10px; padding: 18px 22px; margin: 18px 0 4px;
+  }
+  .disclaimer h3 {
+    font-size: 15px; font-weight: 700; color: #b45309; margin-bottom: 10px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .disclaimer h3 .ico {
+    width: 20px; height: 20px; border-radius: 50%; background: #d97706; color: #fff;
+    display: inline-grid; place-items: center; font-size: 13px; font-weight: 800; flex: 0 0 auto;
+  }
+  .disclaimer p { font-size: 13.5px; color: #7c4a12; line-height: 1.8; margin: 3px 0; }
+  .disclaimer p b { color: #b45309; }
+  .verify-badge {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 12px; font-weight: 700; padding: 3px 12px;
+    border-radius: 20px; cursor: pointer; user-select: none;
+    margin-left: 10px; vertical-align: 2px;
+    border: 1.5px solid #d1d5db; transition: all .18s ease;
+  }
+  .verify-badge .dot { width: 8px; height: 8px; border-radius: 50%; background: #9ca3af; transition: .18s; }
+  .verify-badge.unverified { background: #f3f4f6; color: #9ca3af; border-color: #d1d5db; }
+  .verify-badge.verified { background: #dcfce7; color: #166534; border-color: #16a34a; }
+  .verify-badge.verified .dot { background: #16a34a; }
+</style>
+</head>
+<body>
+<div class="layout">
+
+  <aside class="sidebar">
+    <div class="brand">财务人AI速查手册<small>一看就会 · 拿来即用</small></div>
+    <button class="reset-btn" id="resetBtn">恢复默认设置</button>
+    <nav id="nav">
+      <a href="#overview">使用说明</a>
+      <div class="group-label">核心模块</div>
+      <a href="#m1">1. 日常账务与发票</a>
+      <a href="#m2">2. 税务</a>
+      <a href="#m3">3. 财务报表与分析</a>
+      <a href="#m4">4. 预算与资金管理</a>
+      <a href="#m5">5. 金融市场数据</a>
+      <a href="#m6">6. 投资研究</a>
+      <a href="#m7">7. PPT 汇报</a>
+      <a href="#m8">8. 文档与流程自动化</a>
+      <a href="#m9">9. 常用信息查询</a>
+      <a href="#m10">10. 应付账款与供应商管理</a>
+      <a href="#m11">11. 应收账款与信用管理</a>
+      <a href="#m12">12. 内控与审计</a>
+      <a href="#m13">13. 成本、采购与供应链</a>
+      <a href="#m14">14. 项目、工程与合同财务</a>
+      <a href="#m15">15. 并购、投融资与尽调</a>
+      <a href="#m16">16. 财务共享与数据系统</a>
+      <a href="#m17">17. 财务BP与业务协同</a>
+      <a href="#m18">18. 财务沟通与文字</a>
+    </nav>
+  </aside>
+
+  <main class="main">
+
+    <div class="page-header">
+      <h1>财务人AI速查手册</h1>
+      <p>8 大功能模块 · 每个功能点配好「可直接复制的提问模板」。点卡片右侧的「复制提问」按钮，粘贴到对话框里按你的实际情况改几个字就能用。</p>
+    </div>
+
+    <div class="disclaimer">
+      <h3><span class="ico">!</span>重要提示 · 免责声明</h3>
+      <p>本手册所载内容、工具说明及据此生成的各类结果（包括但不限于财务数据、记账凭证、财务报表、税务测算、投资分析等）<b>仅供参考</b>，不构成任何专业意见、建议或承诺。</p>
+      <p>所有生成结果在使用前，均须由具备相应资质的财务、税务、法律等<b>专业人员复核确认</b>，方可用于正式申报、入账、开票或对外披露。</p>
+      <p>因依赖本工具结果而直接或间接导致的任何数据差错、遗漏、延误或损失，本手册及工具提供方<b>不承担任何责任</b>。</p>
+      <p>涉及纳税申报、发票开具、财务入账、对外报告等事项，请以国家税务总局、财政部门等<b>官方渠道</b>及专业机构出具的正式文件为准。</p>
+    </div>
+
+    <!-- ============ 使用说明 ============ -->
+    <section class="module" id="overview">
+      <div class="module-head">
+        <div class="num">开始之前</div>
+        <h2>使用说明</h2>
+        <p class="lead">三条核心规则，先看一眼能少走很多弯路。</p>
+      </div>
+      <div class="overview-grid">
+        <div class="ov-card">
+          <h3>怎么用这套手册</h3>
+          <ul>
+            <li>每个功能卡里都有一条 <b>提问模板</b>，点「复制提问」按钮即可复制。</li>
+            <li>模板里的 <b>XX、金额、公司名</b> 是占位符，替换成你的真实数据再发。</li>
+            <li>涉及数字/表格的，建议 <b>把 Excel、PDF、图片直接拖进对话框</b>，比纯文字描述更准。</li>
+          </ul>
+        </div>
+        <div class="ov-card">
+          <h3>数据源与连接器状态</h3>
+          <ul>
+            <li>行情、研报、宏观、企业尽调等 <b>实时数据</b>，需要对应的数据连接器处于「已连接/已信任」状态才能查。</li>
+            <li>连接器未连接时，我会改用 <b>公开网络数据</b> 或 <b>你上传的本地文件</b> 完成任务。</li>
+            <li>记账、开票、报税类请优先使用对应的财务税务平台连接器，数据更合规。</li>
+          </ul>
+        </div>
+        <div class="ov-card">
+          <h3>提问的通用技巧</h3>
+          <ul>
+            <li>一次说清 <b>对象 + 数据 + 想要的结果</b>，例如「根据这份表帮我算 X，输出成表格」。</li>
+            <li>要结果前先给 <b>背景和口径</b>（如「按含税金额」「毛利率=毛利/收入」），避免口径打架。</li>
+            <li>复杂任务拆成 <b>多步</b>：先算数 → 再分析 → 最后出报告/PPT。</li>
+          </ul>
+        </div>
+        <div class="ov-card">
+          <h3>我能直接做的 vs 需连数据源的</h3>
+          <ul>
+            <li><b>可直接做</b>：Excel 处理、报表编制、比率计算、预算模型、报告/PPT、PDF 解析、估值建模。</li>
+            <li><b>需连数据源</b>：实时行情、研报、龙虎榜、宏观数据、企业尽调、开票报税。</li>
+            <li>不确定的，直接把需求丢给我，我会告诉你缺什么、怎么补。</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ 模块1 ============ -->
+    <section class="module" id="m1">
+      <div class="module-head">
+        <span class="num">模块 1</span>
+        <h2>日常账务与发票</h2>
+        <p class="lead">发票提取与汇总、票据入账、对账结账，以及固定资产折旧、存货成本、期末计提、报销审核等日常账务。</p>
+        <div class="source">无需连接器，上传发票 PDF/图片即可自动提取、汇总；票据识别可配合扫描识别工具辅助。</div>
+      </div>
+
+      <div class="card">
+        <h3>发票信息提取</h3>
+        <p class="desc">上传发票 PDF/图片，自动提取核心字段并做勾稽校验。</p>
+        <div class="prompt-box">
+          <code>我上传了发票 PDF/图片，帮我自动提取核心信息：
+发票号码、开票日期、购买方名称+税号、销售方名称+税号、
+项目名称、金额、税率、税额、价税合计
+输出成结构化表格，并校验「金额 × 税率 = 税额」是否一致</code>
+          <button class="copy-btn">复制提问</button>
+        </div>
+        <div class="info-row">
+          <span><b>需准备</b>：发票 PDF / 图片（或截图）</span>
+          <span><b>产出</b>：结构化字段表 + 勾稽校验结果</span>
+        </div>
+        <div class="note">注意：支持一次传多张批量提取；扫描件/模糊图片识别精度会略降，关键数字建议复核。</div>
+      </div>
+
+      <div class="card">
+        <h3>收集汇总</h3>
+        <p class="desc">把多张发票信息收集起来，汇总成台账和统计表。</p>
+        <div class="prompt-box">
+          <code>帮我把这些发票汇总成台账：
+1. 上传多张发票 PDF/图片（可分批追加）
+2. 逐张提取核心字段，按发票号码自动去重
+3. 汇总成一张 Excel 台账（号码、日期、购销方、金额、税额、价税合计）
+4. 输出汇总统计（总金额、总税额，按供应商/月份分类）</code>
+          <button class="copy-btn">复制提问</button>
+        </div>
+        <div class="info-row">
+          <span><b>需准备</b>：多张发票文件（PDF/图片）</span>
+          <span><b>产出</b>：发票台账 Excel + 汇总统计表</span>
+        </div>
+        <div class="note">注意：分批上传时会持续追加到同一台账；重复发票按发票号码自动去重并提示。</div>
+      </div>
+
+      <div class="card">
+        <h3>银行流水 / 回单 / 合同 PDF 识别入账</h3>
+        <p class="desc">从流水、回单、合同里提取关键字段，自动生成记账凭证。</p>
+        <div class="prompt-box">
+          <code>我上传了银行回单/流水/合同 PDF，帮我：
+1. 提取关键字段（金额、日期、对方户名、账号、摘要）
+2. 判断借贷方向，生成记账凭证
+3. 汇总成一张入账明细表</code>
+          <button class="copy-btn">复制提问</button>
+        </div>
+        <div class="info-row">
+          <span><b>需准备</b>：流水/回单/合同文件（PDF、图片、Excel）</span>
+          <span><b>产出</b>：字段提取表 + 记账凭证 + 入账明细</span>
+        </div>
+        <div class="note">注意：涉及资金收付的凭证建议人工复核后再过账，识别结果可能有少量误差。</div>
+      </div>
+
+      <div class="card">
+        <h3>月结年结辅助、往来对账、调节表</h3>
+        <p class="desc">账面与银行/往来方对账，找差异并出余额调节表。</p>
+        <div class="prompt-box">
+          <code>帮我对账：
+1. 上传我方账面明细和银行对账单（或往来方明细）
+2. 自动匹配相同记录，标出差异项
+3. 生成银行余额调节表 / 往来对账差异表</code>
+          <button class="copy-btn">复制提问</button>
+        </div>
+        <div class="info-row">
+          <span><b>需准备</b>：双方明细（两份 Excel/PDF）</span>
+          <span><b>产出</b>：匹配结果 + 差异清单 + 调节表</span>
+        </div>
+        <div class="note">注意：对账口径（按金额、日期、摘要）要提前说清，否则匹配结果会不准。</div>
+      </div>
+
+      <div class="card">
+        <h3>固定资产折旧计算</h3>
+        <p class="desc">录入固定资产信息，自动计算月折旧额并生成折旧明细表。</p>
+        <div class="prompt-box">
+          <code>帮我计算固定资产折旧：
+1. 上传固定资产清单（资产名称、原值、使用年限、残值率、启用日期）
+2. 用平均年限法计算月折旧额、累计折旧、账面净值
+3. 生成折旧明细表</code>
+          <button class="copy-btn">复制提问</button>
+        </div>
+        <div class="info-row">
+          <span><b>需准备</b>：固定资产清单（原值、年限、残值率、启用日期）</span>
+          <span><b>产出</b>：折旧明细表 + 月度折旧额</span>
+        </div>
+        <div class="note">注意：折旧方法（年限平均/双倍余额/年数总和）和残值率要先说清。</div>
+      </div>
+
+      <div class="card">
+        <h3>存货成本核算</h3>
+        <p class="desc">按指定方法核算存货的发出成本和期末结存。</p>
+        <div class="prompt-box">
+          <code>帮我核算存货成本：
+1. 上传存货进销存明细（入库数量/单价、出库数量）
+2. 用（先进先出/加权平均）法计算发出成本和期末结存
+3. 生成存货成本核算表</code>
+          <button class="copy-btn">复制提问</button>
+        </div>
+        <div class="info-row">
+          <span><b>需准备</b>：进销存明细（数量、单价）</span>
+          <span><b>产出</b>：发出成本 + 期末结存 + 成本核算表</span>
+        </div>
+        <div class="note">注意：成本核算方法（先进先出/加权平均）要与会计政策保持一致。</div>
+      </div>
+
+      <div class="card">
+        <h3>期末计提与摊销</h3>
+        <p class="desc">月末计提预提费用、摊销待摊费用、坏账准备等。</p>
+        <div class="prompt-box">
+          <code>帮我做期末计提与摊销：
+1. 列出需要计提/摊销的项目（如房租、保险、利息、坏账准备）
+2. 计算各项目本月应计提/摊销金额
+3. 生成计提摊销分录</code>
+          <button class="copy-btn">复制提问</button>
+        </div>
+        <div class="info-row">
+          <span><b>需准备</b>：待计提/摊销项目及金额、期间</span>
+          <span><b>产出</b>：计提摊销明细 + 记账分录</span>
+        </div>
+        <div class="note">注意：计提摊销的期间和基数要准确，否则影响当期损益。</div>
+      </div>
+
+      <div class="card">
+        <h3>报销合规审核</h3>
+        <p class="desc">检查报销单的发票真伪、抬头税号、金额及标准合规性。</p>
+        <div class="prompt-box">
+          <code>帮我审核这张报销单：
+1. 上传报销单和发票（图片/PDF）
+2. 检查发票真伪、抬头税号、金额是否一致
+3. 核对是否符合公司报销标准，标出问题项</code>
+          <button class="copy-btn">复制提问</button>
+        </div>
+        <div class="info-row">
+          <span><b>需准备</b>：报销单 + 发票</span>
+          <span><b>产出</b>：审核结论 + 问题清单</span>
+        </div>
+        <div class="note">注意：报销标准需提供公司制度，我才能核对是否超标。</div>
+      </div>
+
+      <div class="card">
+        <h3>差旅 / 招待费标准核对</h3>
+        <p class="desc">按公司制度核对差旅费、业务招待费是否超标。</p>
+        <div class="prompt-box">
+          <code>帮我核对这笔差旅/招待费：
+1. 提供费用明细（交通、住宿、餐饮、招待）
+2. 提供公司报销标准（如住宿限额、餐标、招待比例）
+3. 逐项核对是否超标，标出超标项</code>
+          <button class="copy-btn">复制提问</button>
+        </div>
+        <div class="info-row">
+          <span><b>需准备</b>：费用明细 + 公司报销标准</span>
+          <span><b>产出</b>：核对结果 + 超标项清单</span>
+        </div>
+        <div class="note">注意：业务招待费还有税前扣除比例限制（营业收入的 5‰），可一并提示。</div>
+      </div>
+    </section>
+
+    <!-- ============ 模块2 ============ -->
+    <section class="module" id="m2">
+      <div class="module-head">
+        <span class="num">模块 2</span>
+        <h2>税务</h2>
+        <p class="lead">申报测算、税收优惠匹配、发票合规排查，以及工资与个税计算。</p>
+        <div class="source">所需数据源：报税平台、法规检索工具（需连接对应连接器）。测算与筹划类可直接用我上传的数据完成。</div>
+      </div>
+
+      <div class="card">
+        <h3>增值税 / 企业所得税 / 个税申报辅助</h3>
+        <p class="desc">根据明细数据测算应纳税额，整理申报底稿。</p>
+        <div class="prompt-box">
+          <code>帮我测算本期税额并整理申报数据：
+1. 上传销项/进项明细（或收入成本利润数据）
+2. 测算应纳增值税（销项-进项）和企业所得税
+3. 输出申报数据底稿 + 需要核对的风险点</code>
+          <button class="copy-btn">复制提问</button>
+        </div>
+        <div class="info-row">
+          <span><b>需准备</b>：销项/进项明细、收入成本费用表</span>
+          <span><b>产出</b>：税额测算表 + 申报底稿 + 风险提示</span>
+        </div>
+        <div class="note">注意：正式申报需在电子税务局等官方平台提交，我负责算数和整理，不代你完成官方申报动作。</div>
+      </div>
+
+      <div class="card">
+        <h3>税收优惠匹配与税务筹划</h3>
+        <p class="desc">按企业特征梳理能享受的优惠，给出合规筹划思路。</p>
+        <div class="prompt-box">
+          <code>帮我做税收优惠梳理和筹划：
+我公司属于 XX 行业，注册地 XX，员工数 XX，
+年收入 XX 万，是否高新技术/科技型：是/否
+帮我列出可享受的优惠（小微、高新、研发加计扣除等），并给合规筹划建议</code>
+          <button class="copy-btn">复制提问</button>
+        </div>
+        <div class="info-row">
+          <span><b>需准备</b>：行业、规模、地区、资质、收入利润</span>
+          <span><b>产出</b>：可享受优惠清单 + 筹划建议 + 注意事项</span>
+        </div>
+        <div class="note">注意：筹划建议仅供参考，落地前请结合当地政策并由专业税务人员复核。</div>
+      </div>
+
+      <div class="card">
+        <h3>发票合规与虚开风险排查</h3>
+        <p class="desc">检查交易与发票是否三流一致，识别虚开、异常进项等风险。</p>
+        <div class="prompt-box">
+          <code>帮我做发票合规排查：
+1. 上传发票清单（或交易特征描述）
+2. 检查三流一致（合同、资金、发票）、进项异常、大额顶格、连号开票等
+3. 输出风险点清单 + 整改建议</code>
+          <button class="copy-btn">复制提问</button>
+        </div>
+        <div class="info-row">
+          <span><b>需准备</b>：发票清单/交易流水/合同信息</span>
+          <span><b>产出</b>：风险点清单 + 整改建议</span>
+        </div>
+        <div class="note">注意：这属于自查辅助，重大风险请以税务稽查口径为准。</div>
+      </div>
+
+      <div class="card">
+        <h3>工资与个税计算</h3>
+        <p class="desc">按工资表计算应发、社保公积金、个税和实发金额。</p>
+        <div class="prompt-box">
+          <code>帮我计算工资和个税：
+1. 上传工资表（基本工资、补贴、奖金、社保公积金基数）
+2. 计算应发工资、个人社保公积金、个税（累计预扣法）、实发
+3. 生成工资明细表和个税计算表</code>
+          <button class="copy-btn">复制提问</button>
+        </div>
+        <div class="info-row">
+          <span><b>需准备</b>：工资表 + 社保公积金基数/比例 + 专项附加扣除</span>
+          <span><b>产出</b>：工资明细 + 个税计算表</span>
+        </div>
+        <div class="note">注意：个税按累计预扣法，专项附加扣除项目（子女教育、房贷等）要提供完整。</div>
+      </div>
+    </section>
+
+    <!-- ============ 模块3 ============ -->
+    <section class="module" id="m3">
+      <div class="module-head">
+        <span class="num">模块 3</span>
+        <h2>财务报表与分析</h2>
+        <p class="lead">三大报表、财务比率、经营分析，以及合并抵销、报表附注、盈亏平衡与敏感性分析。</p>
+        <div class="source">无需数据源，上传科目余额表、试算平衡表或财务数据即可直接完成。</div>
+      </div>
+
+      <div class="card">
+        <h3>三大报表编制</h3>
+        <p class="desc">由科目余额表/试算平衡表生成资产负债表、利润表、现金流量表。</p>
+        <div class="prompt-box">
+          <code>帮我编报表：
+1. 上传科目余额表 / 试算平衡表
+2. 生成资产负债表、利润表
+3. 尽可能编制现金流量表（间接法/直接法）
+4. 校验勾稽关系，标出不平的地方</code>
+          <button class="copy-btn">复制提问</button>
+        </div>
+        <div class="info-row">
+          <span><b>需准备</b>：科目余额表 / 试算平衡表（Excel）</span>
+          <span><b>产出</b>：三张报表 + 勾稽校验说明</span>
+        </div>
+        <div class="note">注意：现金流量表若明细不足，我会用间接法估算并标注假设。</div>
+      </div>
+
+      <div class="card">
+        <h3>财务比率计算与解读</h3>
+        <p class="desc">算核心财务比率并给出通俗解读和行业对标。</p>
+        <div class="prompt-box">
+          <code>帮我算财务比率并解读：
+1. 上传财报数据（或给关键科目数）
+2. 计算 ROE、ROA、毛利率、净利率、周转率、资产负债率、流动比率等
+3. 逐项解读 + 和行业水平对标 + 指出异常点</code>
+          <button class="copy-btn">复制提问</button>
+        </div>
+        <div class="info-row">
+          <span><b>需准备</b>：财报数据 / 关键科目数</span>
+          <span><b>产出</b>：比率表 + 解读 + 对标结论</span>
+        </div>
+        <div class="note">注意：说清口径（如毛利率=毛利/收入），否则不同口径结果会打架。</div>
+      </div>
+
+      <div class="card">
+        <h3>经营分析报告 / PPT 生成</h3>
+        <p class="desc">把经营数据变成有结论、有原因、有建议的报告或 PPT。</p>
+        <div class="prompt-box">
+          <code>帮我写经营分析报告并生成 PPT：
+1. 上传本月/本年经营数据（收入、成本、费用、利润）
+2. 分析变动原因（同比/环比/预算差异）
+3. 输出 Word 报告 + 一份汇报 PPT</code>
+          <button class="copy-btn">复制提问</button>
+        </div>
+        <div class="info-row">
+          <span><b>需准备</b>：经营数据（Excel/口径说明）</span>
+          <span><b>产出</b>：分析报告 + 汇报 PPT</span>
+        </div>
+        <div class="note">注意：告诉我汇报对象（管理层/董事会），我会调整详略和措辞。</div>
+      </div>
+
+      <div class="card">
+        <h3>合并报表抵销</h3>
+        <p class="desc">母子公司内部往来、内部交易的抵销分录。</p>
+        <div class="prompt-box">
+          <code>帮我做合并报表抵销：
+1. 提供母子公司报表 + 内部往来/交易明细
+2. 抵销内部往来、内部交易、未实现利润
+3. 生成抵销分录和合并工作底稿</code>
+          <button class="copy-btn">复制提问</button>
+        </div>
+        <div class="info-row">
+          <span><b>需准备</b>：母子公司报表 + 内部往来/交易明细</span>
+          <span><b>产出</b>：抵销分录 + 合并工作底稿</span>
+        </div>
+        <div class="note">注意：需提供完整的内部交易和往来明细，否则合并结果会虚增。</div>
+      </div>
+
+      <div class="card">
+        <h3>报表附注编制</h3>
+        <p class="desc">按披露要求生成财务报表附注说明。</p>
+        <div class="prompt-box">
+          <code>帮我编制报表附注：
+1. 提供报表数据 + 会计政策说明
+2. 按披露要求生成附注（货币资金、应收款、存货、固定资产等科目明细）
+3. 输出附注文档</code>
+          <button class="copy-btn">复制提问</button>
+        </div>
+        <div class="info-row">
+          <span><b>需准备</b>：报表数据 + 科目明细 + 会计政策</span>
+          <span><b>产出</b>：报表附注文档</span>
+        </div>
+        <div class="note">注意：附注披露格式需符合企业会计准则或上市公司披露要求。</div>
+      </div>
+
+      <div class="card">
+        <h3>盈亏平衡分析</h3>
+        <p class="desc">计算保本点，做本量利分析。</p>
+        <div class="prompt-box">
+          <code>帮我做盈亏平衡分析：
+1. 提供固定成本、单位变动成本、销售单价
+2. 计算保本点销量/销售额、边际贡献率
+3. 输出盈亏平衡分析表和结论</code>
+          <button class="copy-btn">复制提问</button>
+        </div>
+        <div class="info-row">
+          <span><b>需准备</b>：固定成本、变动成本、单价</span>
+          <span><b>产出</b>：保本点 + 边际贡献 + 分析结论</span>
+        </div>
+        <div class="note">注意：区分固定/变动成本是准确性的关键。</div>
+      </div>
+
+      <div class="card">
+        <h3>敏感性分析</h3>
+        <p class="desc">测算价格、成本、销量变动对利润的影响。</p>
+        <div class="prompt-box">
+          <code>帮我做敏感性分析：
+1. 提供基础财务数据（收入、成本、利润）
+2. 假设价格/成本/销量分别变动 ±5%、±10%
+3. 测算各因素对利润的影响程度，输出敏感性分析表</code>
+          <button class="copy-btn">复制提问</button>
+        </div>
+        <div class="info-row">
+          <span><b>需准备</b>：基础财务数据 + 变动幅度</span>
+          <span><b>产出</b>：敏感性分析表 + 影响排序</span>
+        </div>
+        <div class="note">注意：可指定单因素或多因素联动分析。</div>
+      </div>
+    </section>
+
+    <!-- ============ 模块4 ============ -->
+    <section class="module" id="m4">
+      <div class="module-head">
+        <span class="num">模块 4</span>
+        <h2>预算与资金管理</h2>
+        <p class="lead">预算预测、成本分摊、现金流，以及贷款还款、票据台账、资金风险与应收账龄。</p>
+        <div class="source">无需数据源，上传历史数据与经营假设即可完成。</div>
+      </div>
+
+      <div class="card">
+        <h3>预算编制与滚动预测</h3>
+        <p class="desc">按历史数据 + 目标假设搭年度预算，并做滚动预测。</p>
+        <div class="prompt-box">
+          <code>帮我搭预算：
+1. 上传去年实际数据 + 今年目标（收入增长 X%）
+2. 生成年度预算表（分月、分项目）
+3. 做 12 个月滚动预测，标出缺口和风险</code>
+          <button class="copy-btn">复制提问</button>
+        </div>
+        <div class="info-row">
+          <span><b>需准备</b>：历史数据 + 目标假设</span>
+          <span><b>产出</b>：年度预算表 + 滚动预测 + 缺口提示</span>
+        </div>
+        <div class="note">注意：假设要明确（增长率、费用率、季节性），我会按你的假设算，不替你拍假设。</div>
+      </div>
+
+      <div class="card">
+        <h3>成本归集与分摊</h3>
+        <p class="desc">按部门/产品/项目归集成本，用指定方法分摊。</p>
+        <div class="prompt-box">
+          <code>帮我做成本归集与分摊：
+1. 上传成本费用明细
+2. 按（部门/产品/项目）维度归集
+3. 用（直接分配法/作业成本法 ABC）分摊
+4. 输出成本明细表 + 单位成本</code>
+          <button class="copy-btn">复制提问</button>
+        </div>
+        <div class="info-row">
+          <span><b>需准备</b>：成本费用明细 + 分摊维度与动因</span>
+          <span><b>产出</b>：成本明细表 + 单位成本</span>
+        </div>
+        <div class="note">注意：分摊动因（工时、产量、面积等）要讲清楚，结果才可信。</div>
+      </div>
+
+      <div class="card">
+        <h3>现金流预测与多主体合并</h3>
+        <p class="desc">按账期和经营计划预测现金流；合并多子公司报表。</p>
+        <div class="prompt-box">
+          <code>帮我做现金流预测和合并：
+1. 上传应收/应付账期 + 经营计划
+2. 做未来 X 个月现金流预测，标出资金缺口
+3. 上传各子公司报表，做合并报表（抵销内部往来/交易）</code>
+          <button class="copy-btn">复制提问</button>
+        </div>
+        <div class="info-row">
+          <span><b>需准备</b>：账期数据、经营计划、各主体报表</span>
+          <span><b>产出</b>：现金流预测 + 合并报表 + 抵销分录</span>
+        </div>
+        <div class="note">注意：合并抵销需提供内部交易和往来明细，否则合并结果会虚增。</div>
+      </div>
+
+      <div class="card">
+        <h3>贷款利息与还款计划</h3>
+        <p class="desc">按贷款要素计算利息并生成还款计划。</p>
+        <div class="prompt-box">
+          <code>帮我算贷款利息和还款计划：
+1. 提供贷款金额、年利率、期限、还款方式（等额本息/等额本金/先息后本）
+2. 计算每期还款额、利息、本金
+3. 生成还款计划表</code>
+          <button class="copy-btn">复制提问</button>
+        </div>
+        <div class="info-row">
+          <span><b>需准备</b>：贷款金额、利率、期限、还款方式</span>
+          <span><b>产出</b>：还款计划表 + 总利息</span>
+        </div>
+        <div class="note">注意：利率类型（固定/浮动）和计息方式要说清。</div>
+      </div>
+
+      <div class="card">
+        <h3>银行承兑汇票台账</h3>
+        <p class="desc">管理承兑汇票的收票、背书、贴现、到期。</p>
+        <div class="prompt-box">
+          <code>帮我建银行承兑汇票台账：
+1. 提供汇票信息（票号、出票人、金额、到期日）
+2. 记录收票、背书转让、贴现、到期托收状态
+3. 生成台账并提示即将到期的票据</code>
+          <button class="copy-btn">复制提问</button>
+        </div>
+        <div class="info-row">
+          <span><b>需准备</b>：汇票要素（票号、金额、到期日等）</span>
+          <span><b>产出</b>：承兑汇票台账 + 到期提醒</span>
+        </div>
+        <div class="note">注意：贴现利息和到期托收要及时登记，避免逾期。</div>
+      </div>
+
+      <div class="card">
+        <h3>资金风险预警</h3>
+        <p class="desc">监控应收账款逾期、现金流缺口等资金风险。</p>
+        <div class="prompt-box">
+          <code>帮我做资金风险预警：
+1. 提供应收账款、应付账款、现金流数据
+2. 识别逾期应收、现金流缺口、偿债压力等风险
+3. 输出风险清单和预警等级</code>
+          <button class="copy-btn">复制提问</button>
+        </div>
+        <div class="info-row">
+          <span><b>需准备</b>：应收/应付/现金流数据</span>
+          <span><b>产出</b>：风险清单 + 预警等级 + 建议</span>
+        </div>
+        <div class="note">注意：预警阈值可自定义，我按你的标准标红。</div>
+      </div>
+
+      <div class="card">
+        <h3>应收账款账龄分析</h3>
+        <p class="desc">按账龄区间分类应收款，标出逾期和坏账风险。</p>
+        <div class="prompt-box">
+          <code>帮我做应收账款账龄分析：
+1. 上传应收账款明细（客户、金额、开票日期/到期日）
+2. 按账龄区间（0-30/31-60/61-90/90 天以上）分类
+3. 标出逾期款项和坏账风险，生成账龄分析表</code>
+          <button class="copy-btn">复制提问</button>
+        </div>
+        <div class="info-row">
+          <span><b>需准备</b>：应收明细（客户、金额、日期）</span>
+          <span><b>产出</b>：账龄分析表 + 逾期/风险提示</span>
+        </div>
+        <div class="note">注意：账龄区间可自定义，坏账准备计提比例按公司政策。</div>
+      </div>
+    </section>
+
+    <!-- ============ 模块5 ============ -->
+    <section class="module" id="m5">
+      <div class="module-head">
+        <span class="num">模块 5</span>
+        <h2>金融市场数据</h2>
+        <p class="lead">行情、财报研报、龙虎榜、宏观数据的一站式查询。</p>
+        <div class="source">所需数据源：行情/金融数据源（需连接对应连接器）。连接器未连接时，我用公开网络数据兜底。</div>
+      </div>
+
+      <div class="card">
+        <h3>行情数据查询</h3>
+        <p class="desc">查股票、基金、ETF、可转债、期货的行情与估值。</p>
+        <div class="prompt-box">
+          <code>帮我查 XX（股票代码/名称）的：
+最新价、涨跌幅、K 线走势、成交量、PE/PB 估值
+（也可换成某 ETF / 可转债 / 期货）</code>
+          <button class="copy-btn">复制提问</button>
+        </div>
+        <div class="info-row">
+          <span><b>需准备</b>：标的代码或名称、想要的时间区间</span>
+          <span><b>产出</b>：行情快照 + 走势图 + 估值</span>
+        </div>
+        <div class="note">注意：实时行情需数据源已连接；未连接时我给最近可得的公开数据。</div>
+      </div>
+
+      <div class="card">
+        <h3>财报 / 研报 / 公告 / 新闻 / 龙虎榜</h3>
+        <p class="desc">一站式拉取公司基本面与市场动态信息。</p>
+        <div class="prompt-box">
+          <code>帮我找 XX 公司/标的的：
+最新财报关键指标、近期券商研报观点、重要公告、
+相关新闻，以及龙虎榜上榜情况</code>
+          <button class="copy-btn">复制提问</button>
+        </div>
+        <div class="info-row">
+          <span><b>需准备</b>：公司/标的名称</span>
+          <span><b>产出</b>：财报摘要 + 研报观点 + 公告/新闻 + 龙虎榜</span>
+        </div>
+        <div class="note">注意：研报观点多为券商立场，我会标注来源，供你自行判断。</div>
+      </div>
+
+      <div class="card">
+        <h3>宏观数据</h3>
+        <p class="desc">查 GDP、CPI、PPI、社融、M2、利率、汇率等宏观指标。</p>
+        <div class="prompt-box">
+          <code>帮我查最新宏观数据及趋势：
+GDP、CPI、PPI、社融、M2、LPR/利率、人民币汇率
+（可指定时间范围，或只看某几项）</code>
+          <button class="copy-btn">复制提问</button>
+        </div>
+        <div class="info-row">
+          <span><b>需准备</b>：关注的指标 + 时间范围</span>
+          <span><b>产出</b>：数据表 + 趋势图 + 简要解读</span>
+        </div>
+        <div class="note">注意：宏观数据发布有固定日历，我会标注数据所属月份和来源。</div>
+      </div>
+
+      <div class="card">
+        <h3>数据通道怎么选</h3>
+        <p class="desc">不同数据源各有侧重，按需求选通道。</p>
+        <div class="prompt-box">
+          <code>我要查 XX 数据，帮我推荐最合适的数据源，并说明：
+各数据源覆盖范围、是否免费、数据更新时间、能否出图表</code>
+          <button class="copy-btn">复制提问</button>
+        </div>
+        <div class="info-row">
+          <span><b>需准备</b>：你想查的数据类型</span>
+          <span><b>产出</b>：数据源对比 + 推荐</span>
+        </div>
+        <div class="note">注意：不同数据源覆盖范围不同，可先告诉我你要查什么，我帮你选合适的通道。</div>
+      </div>
+    </section>
+
+    <!-- ============ 模块6 ============ -->
+    <section class="module" id="m6">
+      <div class="module-head">
+        <span class="num">模块 6</span>
+        <h2>投资研究</h2>
+        <p class="lead">行业研究、公司画像与对标、估值建模、企业尽调。</p>
+        <div class="source">所需数据源：企业工商/信用数据源（需连接对应连接器）。行业与估值研究可配合公开数据完成。</div>
+      </div>
+
+      <div class="card">
+        <h3>行业研究</h3>
+        <p class="desc">输出行业规模、增速、格局、产业链、政策与龙头对比。</p>
+        <div class="prompt-box">
+          <code>帮我做 XX 行业的深度研究，输出：
+市场规模与增速、竞争格局、上下游产业链、
+政策环境、龙头公司对比、投资机会与风险</code>
+          <button class="copy-btn">复制提问</button>
+        </div>
+        <div class="info-row">
+          <span><b>需准备</b>：行业名称 + 关注重点</span>
+          <span><b>产出</b>：行业研究报告（可转 PPT）</span>
+        </div>
+        <div class="note">注意：行业数据我会尽量标来源和时点，关键结论请交叉验证。</div>
+      </div>
+
+      <div class="card">
+        <h3>公司画像与竞品对标</h3>
+        <p class="desc">快速勾勒公司全貌，并与竞品做横向对比。</p>
+        <div class="prompt-box">
+          <code>帮我做 XX 公司的画像，并和竞品 YY 对标：
+主营业务、财务指标、股权结构、经营风险，
+以及两家公司在收入/毛利/ROE/市占率上的对比</code>
+          <button class="copy-btn">复制提问</button>
+        </div>
+        <div class="info-row">
+          <span><b>需准备</b>：公司名称 + 对标公司</span>
+          <span><b>产出</b>：公司画像 + 对标表 + 结论</span>
+        </div>
+        <div class="note">注意：股权与司法信息建议连企业工商/司法数据源取权威数据。</div>
+      </div>
+
+      <div class="card">
+        <h3>估值建模</h3>
+        <p class="desc">用 DCF、可比公司、剩余收益等方法给出合理估值区间。</p>
+        <div class="prompt-box">
+          <code>帮我给 XX 公司估值：
+用 DCF（自由现金流折现）+ 可比公司法 + 剩余收益模型
+给出合理股价/市值区间，说明关键假设和敏感性</code>
+          <button class="copy-btn">复制提问</button>
+        </div>
+        <div class="info-row">
+          <span><b>需准备</b>：财报数据 + 增长/折现率假设</span>
+          <span><b>产出</b>：估值模型 + 区间 + 敏感性分析</span>
+        </div>
+        <div class="note">注意：估值高度依赖假设，我会清晰标注假设并做敏感性，供你判断。</div>
+      </div>
+
+      <div class="card">
+        <h3>企业尽调</h3>
+        <p class="desc">工商、股权、司法、诉讼、经营风险、关联方一网打尽。</p>
+        <div class="prompt-box">
+          <code>帮我做 XX 公司的基础尽调：
+工商信息、股权穿透、司法/诉讼、经营异常、
+关联方、失信/被执行记录，输出风险清单</code>
+          <button class="copy-btn">复制提问</button>
+        </div>
+        <div class="info-row">
+          <span><b>需准备</b>：公司全称/统一社会信用代码</span>
+          <span><b>产出</b>：尽调报告 + 风险清单</span>
+        </div>
+        <div class="note">注意：权威尽调建议连企业工商/信用数据源，我可同时做数据整理与风险提炼。</div>
+      </div>
+    </section>
+
+    <!-- ============ 模块7 ============ -->
+    <section class="module" id="m7">
+      <div class="module-head">
+        <span class="num">模块 7</span>
+        <h2>PPT 汇报</h2>
+        <p class="lead">本公司财务数据汇报、同行业对比、个人定期总结的 PPT 生成。</p>
+        <div class="source">无需数据源，上传财务数据、对比公司数据或工作要点即可直接生成。</div>
+      </div>
+
+      <div class="card">
+        <h3>本公司财务数据汇报 PPT</h3>
+        <p class="desc">把公司财务数据整理成管理层汇报用的 PPT。</p>
+        <div class="prompt-box">
+          <code>帮我生成一份公司财务数据汇报 PPT：
+1. 上传财务数据（收入、成本、利润、现金流等）
+2. 展示关键指标、趋势图、同比/环比变化
+3. 给出结论与建议，输出成 PPT</code>
+          <button class="copy-btn">复制提问</button>
+        </div>
+        <div class="info-row">
+          <span><b>需准备</b>：财务数据（Excel/报表）+ 汇报期间</span>
+          <span><b>产出</b>：财务汇报 PPT</span>
+        </div>
+        <div class="note">注意：告诉我汇报对象（管理层/董事会），我会调整详略和措辞。</div>
+      </div>
+
+      <div class="card">
+        <h3>同行业对比公司 PPT</h3>
+        <p class="desc">本公司与同行业可比公司的对标分析 PPT。</p>
+        <div class="prompt-box">
+          <code>帮我做一份同行业对比 PPT：
+1. 选取 XX 行业的 X 家可比公司
+2. 对比收入规模、毛利率、净利率、ROE、市占率等
+3. 输出对标结论和优劣势分析 PPT</code>
+          <button class="copy-btn">复制提问</button>
+        </div>
+        <div class="info-row">
+          <span><b>需准备</b>：对比公司名单 + 各自财务数据</span>
+          <span><b>产出</b>：对标分析 PPT</span>
+        </div>
+        <div class="note">注意：对比口径要一致（同期、同会计政策），否则结论会失真。</div>
+      </div>
+
+      <div class="card">
+        <h3>个人定期总结 PPT</h3>
+        <p class="desc">把个人/部门的周、月、季度工作总结做成 PPT。</p>
+        <div class="prompt-box">
+          <code>帮我生成一份个人/部门总结 PPT：
+1. 期间：本周 / 本月 / 本季度
+2. 输入：完成事项、关键数据成果、遇到的问题
+3. 输出：工作总结 + 数据亮点 + 下期计划 PPT</code>
+          <button class="copy-btn">复制提问</button>
+        </div>
+        <div class="info-row">
+          <span><b>需准备</b>：总结要点 + 成果数据 + 时间段</span>
+          <span><b>产出</b>：定期总结 PPT</span>
+        </div>
+        <div class="note">注意：给出具体数据和成果，比流水账式的罗列更有说服力。</div>
+      </div>
+    </section>
+
+    <!-- ============ 模块8 ============ -->
+    <section class="module" id="m8">
+      <div class="module-head">
+        <span class="num">模块 8</span>
+        <h2>文档与流程自动化</h2>
+        <p class="lead">Excel、Word/PPT、PDF、流程自动化，以及财务制度起草、审计资料准备。</p>
+        <div class="source">无需外部数据源，把文件拖进对话框即可；也可用本地脚本能力做批量处理。</div>
+      </div>
+
+      <div class="card">
+        <h3>Excel 财务模型与数据处理</h3>
+        <p class="desc">清洗、合并、透视、算指标，或搭财务模型。</p>
+        <div class="prompt-box">
+          <code>帮我处理这份 Excel：
+1. 数据清洗（去重、补空、统一格式）
+2. 多表合并 + 数据透视
+3. 计算 XX 指标 / 搭一个 XX 财务模型</code>
+          <button class="copy-btn">复制提问</button>
+        </div>
+        <div class="info-row">
+          <span><b>需准备</b>：Excel 文件 + 处理要求</span>
+          <span><b>产出</b>：处理后的 Excel + 说明</span>
+        </div>
+        <div class="note">注意：敏感数据我仅在本机处理，处理前可先说清保留哪些列。</div>
+      </div>
+
+      <div class="card">
+        <h3>Word / PPT 报告生成</h3>
+        <p class="desc">把数据和要点变成排版好的 Word 或 PPT。</p>
+        <div class="prompt-box">
+          <code>帮我生成一份 Word / PPT：
+主题：XX，内容要点：XX（或上传数据/大纲）
+风格：简洁商务 / 专业正式，页数约 X 页</code>
+          <button class="copy-btn">复制提问</button>
+        </div>
+        <div class="info-row">
+          <span><b>需准备</b>：主题 + 要点/数据 + 风格</span>
+          <span><b>产出</b>：.docx / .pptx 文件</span>
+        </div>
+        <div class="note">注意：告诉我用途（汇报/方案/培训），我会调整结构和详略。</div>
+      </div>
+
+      <div class="card">
+        <h3>PDF 解析</h3>
+        <p class="desc">从合同、财报、年报 PDF 里提取关键条款和数字。</p>
+        <div class="prompt-box">
+          <code>帮我解析这份 PDF（合同/财报/年报）：
+1. 提取关键条款/数字/日期
+2. 生成结构化摘要表
+3. 标出需要重点关注的条款或异常</code>
+          <button class="copy-btn">复制提问</button>
+        </div>
+        <div class="info-row">
+          <span><b>需准备</b>：PDF 文件</span>
+          <span><b>产出</b>：结构化摘要 + 要点清单</span>
+        </div>
+        <div class="note">注意：扫描件/图片型 PDF 识别精度略低，重要数字请二次核对。</div>
+      </div>
+
+      <div class="card">
+        <h3>财务流程自动化</h3>
+        <p class="desc">把重复性财务工作设计成定时自动执行的流程。</p>
+        <div class="prompt-box">
+          <code>帮我设计一个自动化流程：
+任务：每周五自动汇总 XX 数据生成报表并提醒
+或：每月 X 号自动对账、自动出经营简报
+告诉我触发时间、数据来源、要输出的结果</code>
+          <button class="copy-btn">复制提问</button>
+        </div>
+        <div class="info-row">
+          <span><b>需准备</b>：任务内容 + 触发时间 + 数据源</span>
+          <span><b>产出</b>：可用的自动化任务 + 运行说明</span>
+        </div>
+        <div class="note">注意：自动任务我会先和你确认执行内容和频率再正式开启。</div>
+      </div>
+
+      <div class="card">
+        <h3>财务制度 / 流程起草</h3>
+        <p class="desc">起草报销制度、付款审批流程、费用标准等文档。</p>
+        <div class="prompt-box">
+          <code>帮我起草一份财务制度：
+1. 类型：报销制度 / 付款审批流程 / 费用标准（可指定）
+2. 提供公司基本情况（规模、行业、现有流程）
+3. 生成制度文档（含目的、适用范围、具体规定、审批权限）</code>
+          <button class="copy-btn">复制提问</button>
+        </div>
+        <div class="info-row">
+          <span><b>需准备</b>：制度类型 + 公司情况</span>
+          <span><b>产出</b>：制度文档（Word）</span>
+        </div>
+        <div class="note">注意：制度要结合公司实际，落地前由管理层审定。</div>
+      </div>
+
+      <div class="card">
+        <h3>审计资料准备</h3>
+        <p class="desc">列审计所需资料清单，整理科目余额表和明细账。</p>
+        <div class="prompt-box">
+          <code>帮我准备审计资料：
+1. 明确审计类型（年审/专项/内审）
+2. 列出所需资料清单（科目余额表、明细账、合同、凭证）
+3. 协助整理和核对资料完整性</code>
+          <button class="copy-btn">复制提问</button>
+        </div>
+        <div class="info-row">
+          <span><b>需准备</b>：审计类型 + 现有资料</span>
+          <span><b>产出</b>：资料清单 + 整理核对结果</span>
+        </div>
+        <div class="note">注意：不同审计类型所需资料不同，清单会相应调整。</div>
+      </div>
+    </section>
+
+    <!-- ============ 模块9 ============ -->
+    <section class="module" id="m9">
+      <div class="module-head">
+        <span class="num">模块 9</span>
+        <h2>常用信息查询</h2>
+        <p class="lead">上市公司股票信息、央行汇率中间价等常用数据的定点查询。</p>
+        <div class="source">所需数据源：行情数据源（需连接对应连接器）；未连接时用公开网络数据兜底。</div>
+      </div>
+
+      <div class="card">
+        <h3>上市公司股票信息查询</h3>
+        <p class="desc">查询某上市公司在指定日期的股票收盘价等信息。</p>
+        <div class="prompt-box">
+          <code>帮我查 XX（公司名称/股票代码）截至 XXXX 年 XX 月 XX 日的股票收盘价，
+以及开盘价、最高价、最低价、成交量等行情信息</code>
+          <button class="copy-btn">复制提问</button>
+        </div>
+        <div class="info-row">
+          <span><b>需准备</b>：公司名称/代码 + 指定日期</span>
+          <span><b>产出</b>：该日期的股票价格数据</span>
+        </div>
+        <div class="note">注意：历史行情需数据源支持，未连接时我给最近可得的公开数据；停牌日无成交价。</div>
+      </div>
+
+      <div class="card">
+        <h3>央行汇率中间价查询</h3>
+        <p class="desc">查询中国人民银行某年某月末日的人民币汇率中间价。</p>
+        <div class="prompt-box">
+          <code>帮我查 XXXX 年 XX 月 XX 日的人民币汇率中间价：
+美元、欧元、日元、港币等（可指定币种）</code>
+          <button class="copy-btn">复制提问</button>
+        </div>
+        <div class="info-row">
+          <span><b>需准备</b>：指定日期 + 币种</span>
+          <span><b>产出</b>：该日期的人民币汇率中间价</span>
+        </div>
+        <div class="note">注意：汇率中间价以中国外汇交易中心/人民银行公布为准；非交易日取上一交易日。</div>
+      </div>
+    </section>
+
+    <!-- ============ 模块10 ============ -->
+    <section class="module" id="m10">
+      <div class="module-head">
+        <span class="num">模块 10</span>
+        <h2>应付账款与供应商管理</h2>
+        <p class="lead">发票识别与三方匹配、付款申请与账期、供应商对账与风险分析。</p>
+        <div class="source">无需连接器，上传发票、采购订单、收货单、应付明细即可处理。</div>
+      </div>
+
+      <div class="card">
+        <h3>发票识别与三方匹配</h3>
+        <p class="desc">识别发票信息，与采购订单、收货单三方匹配并查重。</p>
+        <div class="prompt-box">
+          <code>帮我做发票识别和三方匹配：
+1. 上传发票（图片/PDF）和采购订单、收货单/验收单
+2. 读取发票号码、税率、金额、日期、购买方信息
+3. 与订单、收货单匹配，识别重复发票、异常税率、超合同金额</code>
+          <button class="copy-btn">复制提问</button>
+        </div>
+        <div class="info-row">
+          <span><b>需准备</b>：发票 + 采购订单 + 收货/验收单</span>
+          <span><b>产出</b>：匹配结果 + 异常/重复发票清单</span>
+        </div>
+        <div class="note">注意：三方匹配需订单、收货、发票三单齐全，缺单会标出待补。</div>
+      </div>
+
+      <div class="card">
+        <h3>付款申请与账期管理</h3>
+        <p class="desc">生成付款申请单，按现金计划安排付款优先级。</p>
+        <div class="prompt-box">
+          <code>帮我生成付款申请和安排付款：
+1. 上传应付明细（供应商、金额、账期、到期日）
+2. 检查付款条件和账期，生成付款申请单
+3. 根据现金计划安排付款优先级，预测逾期付款风险</code>
+          <button class="copy-btn">复制提问</button>
+        </div>
+        <div class="info-row">
+          <span><b>需准备</b>：应付明细 + 现金计划</span>
+          <span><b>产出</b>：付款申请单 + 付款优先级 + 逾期预测</span>
+        </div>
+        <div class="note">注意：付款优先级需结合现金计划和账期，我会按你的规则排序。</div>
+      </div>
+
+      <div class="card">
+        <h3>供应商对账与风险识别</h3>
+        <p class="desc">生成供应商对账单，识别差异和关联供应商等风险。</p>
+        <div class="prompt-box">
+          <code>帮我做供应商对账和风险识别：
+1. 上传我司账面与供应商对账单
+2. 识别对账差异
+3. 识别黑名单、关联供应商（同地址/电话/账户）、拆单采购等风险</code>
+          <button class="copy-btn">复制提问</button>
+        </div>
+        <div class="info-row">
+          <span><b>需准备</b>：双方明细 + 供应商信息</span>
+          <span><b>产出</b>：对账差异 + 风险清单</span>
+        </div>
+        <div class="note">注意：关联供应商识别需提供供应商的地址、电话、账户等字段。</div>
+      </div>
+
+      <div class="card">
+        <h3>供应商集中度分析</h3>
+        <p class="desc">分析供应商集中度、付款及时率、折扣是否值得用。</p>
+        <div class="prompt-box">
+          <code>帮我分析供应商：
+1. 上传采购/付款数据
+2. 统计供应商集中度、付款及时率、账龄
+3. 分析提前付款折扣是否值得用，生成未付款原因分析</code>
+          <button class="copy-btn">复制提问</button>
+        </div>
+        <div class="info-row">
+          <span><b>需准备</b>：采购/付款数据</span>
+          <span><b>产出</b>：集中度分析 + 账龄 + 折扣建议</span>
+        </div>
+        <div class="note">注意：提前付款折扣要对比资金成本，才能判断是否划算。</div>
+      </div>
+    </section>
+
+    <!-- ============ 模块11 ============ -->
+    <section class="module" id="m11">
+      <div class="module-head">
+        <span class="num">模块 11</span>
+        <h2>应收账款与信用管理</h2>
+        <p class="lead">客户对账与催收、信用评估与预警、收款匹配核销、逾期与坏账分析。</p>
+        <div class="source">无需连接器，上传应收明细、收款记录、客户信息即可处理。</div>
+      </div>
+
+      <div class="card">
+        <h3>客户对账与催收</h3>
+        <p class="desc">自动生成对账单和催收话术，跟踪回款承诺。</p>
+        <div class="prompt-box">
+          <code>帮我做客户对账和催收：
+1. 上传应收明细
+2. 生成客户对账单和催收话术（邮件/短信/微信）
+3. 记录回款承诺，转为待办事项</code>
+          <button class="copy-btn">复制提问</button>
+        </div>
+        <div class="info-row">
+          <span><b>需准备</b>：应收明细 + 客户信息</span>
+          <span><b>产出</b>：对账单 + 催收话术 + 待办清单</span>
+        </div>
+        <div class="note">注意：催收话术我会按客户分层调整语气（重点客户/一般客户）。</div>
+      </div>
+
+      <div class="card">
+        <h3>信用评估与预警</h3>
+        <p class="desc">客户信用评分、逾期概率、超额度/超账期预警。</p>
+        <div class="prompt-box">
+          <code>帮我做客户信用评估：
+1. 上传客户账龄、历史付款、行业、合同条款
+2. 生成信用评分和客户分层
+3. 提示超信用额度、超账期仍未收款的风险</code>
+          <button class="copy-btn">复制提问</button>
+        </div>
+        <div class="info-row">
+          <span><b>需准备</b>：客户账龄/付款/合同数据</span>
+          <span><b>产出</b>：信用评分 + 分层 + 预警清单</span>
+        </div>
+        <div class="note">注意：信用评分规则可自定义，我会按你的权重打分。</div>
+      </div>
+
+      <div class="card">
+        <h3>收款匹配与核销</h3>
+        <p class="desc">银行收款与发票匹配，处理多付少付尾差。</p>
+        <div class="prompt-box">
+          <code>帮我做收款匹配核销：
+1. 上传银行收款记录和客户发票
+2. 自动匹配收款与发票（含一笔回款对应多张发票）
+3. 处理少付、多付、尾差、扣款，识别未核销收款</code>
+          <button class="copy-btn">复制提问</button>
+        </div>
+        <div class="info-row">
+          <span><b>需准备</b>：收款记录 + 发票明细</span>
+          <span><b>产出</b>：匹配核销结果 + 未核销清单</span>
+        </div>
+        <div class="note">注意：尾差和扣款需说明处理口径（计入费用/冲减收入）。</div>
+      </div>
+
+      <div class="card">
+        <h3>逾期账款与坏账分析</h3>
+        <p class="desc">生成逾期清单、催收计划，分析坏账准备合理性。</p>
+        <div class="prompt-box">
+          <code>帮我做逾期账款和坏账分析：
+1. 上传应收账款明细
+2. 生成逾期账款清单（按金额/天数/重要性排序）
+3. 生成催收计划，分析坏账准备合理性和周转率变化</code>
+          <button class="copy-btn">复制提问</button>
+        </div>
+        <div class="info-row">
+          <span><b>需准备</b>：应收明细</span>
+          <span><b>产出</b>：逾期清单 + 催收计划 + 坏账分析</span>
+        </div>
+        <div class="note">注意：坏账准备计提比例按公司会计政策，我会据此测算。</div>
+      </div>
+    </section>
+
+    <!-- ============ 模块12 ============ -->
+    <section class="module" id="m12">
+      <div class="module-head">
+        <span class="num">模块 12</span>
+        <h2>内控与审计</h2>
+        <p class="lead">内控合规检查、审计抽样与证据整理、审计整改跟踪。</p>
+        <div class="source">无需连接器，上传权限表、操作日志、凭证、审计底稿即可处理。</div>
+      </div>
+
+      <div class="card">
+        <h3>内控合规检查</h3>
+        <p class="desc">检查不相容岗位、权限、异常操作、拆单规避等。</p>
+        <div class="prompt-box">
+          <code>帮我做内控合规检查：
+1. 提供权限表、操作日志、凭证/付款记录
+2. 检查不相容岗位分离、权限过大、离职账号、异常操作时间
+3. 识别手工改凭证、期末集中冲销、拆单规避、无合同无验收付款</code>
+          <button class="copy-btn">复制提问</button>
+        </div>
+        <div class="info-row">
+          <span><b>需准备</b>：权限/操作日志/凭证记录</span>
+          <span><b>产出</b>：内控风险清单</span>
+        </div>
+        <div class="note">注意：不相容岗位（申请/审批/付款）分离是检查重点。</div>
+      </div>
+
+      <div class="card">
+        <h3>审计抽样与证据整理</h3>
+        <p class="desc">按规则抽取审计样本，整理审计证据并分级。</p>
+        <div class="prompt-box">
+          <code>帮我做审计抽样和证据整理：
+1. 明确审计范围和抽样规则
+2. 抽取审计样本（凭证/合同/付款）
+3. 整理审计证据，按风险等级分类，生成内审报告初稿</code>
+          <button class="copy-btn">复制提问</button>
+        </div>
+        <div class="info-row">
+          <span><b>需准备</b>：审计范围 + 凭证/合同/付款数据</span>
+          <span><b>产出</b>：抽样清单 + 证据包 + 风险分级</span>
+        </div>
+        <div class="note">注意：抽样规则（随机/分层/金额阈值）要先说清。</div>
+      </div>
+
+      <div class="card">
+        <h3>审计整改跟踪</h3>
+        <p class="desc">生成整改建议，跟踪责任人和截止日期。</p>
+        <div class="prompt-box">
+          <code>帮我做审计整改跟踪：
+1. 提供审计发现的问题清单
+2. 生成整改建议，分派责任部门和截止日期
+3. 追踪整改状态，生成整改台账</code>
+          <button class="copy-btn">复制提问</button>
+        </div>
+        <div class="info-row">
+          <span><b>需准备</b>：审计问题清单</span>
+          <span><b>产出</b>：整改台账 + 责任跟踪</span>
+        </div>
+        <div class="note">注意：整改台账会按风险等级排序，标出逾期未整改项。</div>
+      </div>
+    </section>
+
+    <!-- ============ 模块13 ============ -->
+    <section class="module" id="m13">
+      <div class="module-head">
+        <span class="num">模块 13</span>
+        <h2>成本、采购与供应链</h2>
+        <p class="lead">采购价格与降本分析、成本差异分析、库存与损耗管理。</p>
+        <div class="source">无需连接器，上传采购明细、成本数据、收发存数据即可处理。</div>
+      </div>
+
+      <div class="card">
+        <h3>采购价格与降本分析</h3>
+        <p class="desc">分析采购价差异、供应商比价、降本项目。</p>
+        <div class="prompt-box">
+          <code>帮我做采购价格分析：
+1. 上传采购明细（物料、供应商、价格、数量）
+2. 识别同物料不同供应商的价格差异、异常价格、量折扣是否兑现
+3. 生成降本项目清单并跟踪兑现情况</code>
+          <button class="copy-btn">复制提问</button>
+        </div>
+        <div class="info-row">
+          <span><b>需准备</b>：采购明细</span>
+          <span><b>产出</b>：价格差异 + 降本清单</span>
+        </div>
+        <div class="note">注意：比价要区分物料规格和采购条件，否则可比性失真。</div>
+      </div>
+
+      <div class="card">
+        <h3>成本差异分析</h3>
+        <p class="desc">拆解标准成本与实际成本差异（料工费）。</p>
+        <div class="prompt-box">
+          <code>帮我做成本差异分析：
+1. 提供标准成本和实际成本数据
+2. 拆解材料、人工、制造费用差异
+3. 计算单位成本、订单/项目真实毛利，识别低毛利负毛利</code>
+          <button class="copy-btn">复制提问</button>
+        </div>
+        <div class="info-row">
+          <span><b>需准备</b>：标准/实际成本数据</span>
+          <span><b>产出</b>：差异拆解 + 单位成本 + 毛利分析</span>
+        </div>
+        <div class="note">注意：料工费差异要分别归因（价格差/用量差），才可执行。</div>
+      </div>
+
+      <div class="card">
+        <h3>库存与损耗管理</h3>
+        <p class="desc">识别呆滞库存、损耗率、库存资金占用。</p>
+        <div class="prompt-box">
+          <code>帮我做库存分析：
+1. 上传收发存数据
+2. 识别呆滞/积压库存、异常报废和盘亏
+3. 预测库存资金占用，模拟采购批量和安全库存</code>
+          <button class="copy-btn">复制提问</button>
+        </div>
+        <div class="info-row">
+          <span><b>需准备</b>：收发存数据</span>
+          <span><b>产出</b>：呆滞库存清单 + 资金占用预测</span>
+        </div>
+        <div class="note">注意：呆滞判定需定义周期（如 90 天无出库），我会按你的口径。</div>
+      </div>
+    </section>
+
+    <!-- ============ 模块14 ============ -->
+    <section class="module" id="m14">
+      <div class="module-head">
+        <span class="num">模块 14</span>
+        <h2>项目、工程与合同财务</h2>
+        <p class="lead">项目预算与完工跟踪、合同财务信息提取与风险。</p>
+        <div class="source">无需连接器，上传项目合同、成本明细即可处理。</div>
+      </div>
+
+      <div class="card">
+        <h3>项目预算与完工跟踪</h3>
+        <p class="desc">建项目预算，跟踪成本、完工百分比、超预算。</p>
+        <div class="prompt-box">
+          <code>帮我做项目财务跟踪：
+1. 上传项目合同和成本明细
+2. 建立项目预算，追踪成本发生和完工百分比
+3. 识别超预算，预测最终成本，计算项目毛利和现金回收</code>
+          <button class="copy-btn">复制提问</button>
+        </div>
+        <div class="info-row">
+          <span><b>需准备</b>：项目合同 + 成本明细</span>
+          <span><b>产出</b>：项目预算 + 完工跟踪 + 毛利</span>
+        </div>
+        <div class="note">注意：完工百分比按投入法或产出法，需明确口径。</div>
+      </div>
+
+      <div class="card">
+        <h3>合同财务信息提取</h3>
+        <p class="desc">从合同提取金额、里程碑、付款条件、风险条款。</p>
+        <div class="prompt-box">
+          <code>帮我提取合同财务信息：
+1. 上传项目合同
+2. 提取金额、里程碑、付款条件、违约金、折扣
+3. 识别租赁、金融工具、履约义务等会计事项，生成合同风险摘要</code>
+          <button class="copy-btn">复制提问</button>
+        </div>
+        <div class="info-row">
+          <span><b>需准备</b>：合同文件</span>
+          <span><b>产出</b>：合同财务信息表 + 风险摘要</span>
+        </div>
+        <div class="note">注意：租赁、金融工具等事项判断需专业复核，我提供初判。</div>
+      </div>
+    </section>
+
+    <!-- ============ 模块15 ============ -->
+    <section class="module" id="m15">
+      <div class="module-head">
+        <span class="num">模块 15</span>
+        <h2>并购、投融资与尽调</h2>
+        <p class="lead">财务尽调数据整理、交易建模与回报测算、投委会材料。</p>
+        <div class="source">无需连接器，上传 BP、审计报告、合同、流水、交易假设即可处理。</div>
+      </div>
+
+      <div class="card">
+        <h3>财务尽调数据整理</h3>
+        <p class="desc">批量读取 BP、审计报告、合同、流水，交叉核对。</p>
+        <div class="prompt-box">
+          <code>帮我做财务尽调数据整理：
+1. 上传 BP、审计报告、合同、银行流水
+2. 提取收入、客户、供应商、负债、现金数据，建立证据索引
+3. 交叉核对，识别收入确认异常、关联交易、未披露债务</code>
+          <button class="copy-btn">复制提问</button>
+        </div>
+        <div class="info-row">
+          <span><b>需准备</b>：尽调资料（BP/审计报告/合同/流水）</span>
+          <span><b>产出</b>：数据提取 + 交叉核对 + 问题清单</span>
+        </div>
+        <div class="note">注意：交叉核对是关键，我会标出不同文件间数字不一致处。</div>
+      </div>
+
+      <div class="card">
+        <h3>交易建模与回报测算</h3>
+        <p class="desc">模拟估值、杠杆、退出回报，计算 IRR/MOIC。</p>
+        <div class="prompt-box">
+          <code>帮我做交易建模：
+1. 提供交易假设（估值、杠杆、退出倍数、期限）
+2. 计算 EBITDA、净债务、营运资金
+3. 模拟估值和回报，分析条款对 IRR、MOIC、现金流的影响</code>
+          <button class="copy-btn">复制提问</button>
+        </div>
+        <div class="info-row">
+          <span><b>需准备</b>：财务数据 + 交易假设</span>
+          <span><b>产出</b>：估值模型 + IRR/MOIC 测算</span>
+        </div>
+        <div class="note">注意：IRR/MOIC 高度依赖假设，我会做敏感性分析。</div>
+      </div>
+
+      <div class="card">
+        <h3>投委会材料生成</h3>
+        <p class="desc">生成投委会材料初稿，检查估值模型逻辑。</p>
+        <div class="prompt-box">
+          <code>帮我生成投委会材料：
+1. 提供尽调结论和交易方案
+2. 生成投委会材料初稿
+3. 检查估值模型的公式和逻辑，更新假设</code>
+          <button class="copy-btn">复制提问</button>
+        </div>
+        <div class="info-row">
+          <span><b>需准备</b>：尽调结论 + 交易方案</span>
+          <span><b>产出</b>：投委会材料初稿</span>
+        </div>
+        <div class="note">注意：估值模型公式我会逐一校验，标出逻辑错误。</div>
+      </div>
+    </section>
+
+    <!-- ============ 模块16 ============ -->
+    <section class="module" id="m16">
+      <div class="module-head">
+        <span class="num">模块 16</span>
+        <h2>财务共享与数据系统</h2>
+        <p class="lead">数据质量与主数据管理、自动化脚本与指标口径、财务知识库。</p>
+        <div class="source">无需连接器，上传多系统数据、制度流程即可处理。</div>
+      </div>
+
+      <div class="card">
+        <h3>数据质量与主数据管理</h3>
+        <p class="desc">字段匹配、主数据查重、数据质量报告。</p>
+        <div class="prompt-box">
+          <code>帮我做数据质量检查：
+1. 上传多系统数据（ERP/CRM/银行/税务）
+2. 匹配字段，识别主数据重复、名称不一致
+3. 统一币种/单位/日期/科目，生成数据质量报告</code>
+          <button class="copy-btn">复制提问</button>
+        </div>
+        <div class="info-row">
+          <span><b>需准备</b>：多系统数据</span>
+          <span><b>产出</b>：数据质量报告 + 主数据问题清单</span>
+        </div>
+        <div class="note">注意：主数据去重需确认合并规则，避免误合并。</div>
+      </div>
+
+      <div class="card">
+        <h3>自动化脚本与指标口径</h3>
+        <p class="desc">生成 SQL、Excel 公式、Power Query、BI 指标逻辑。</p>
+        <div class="prompt-box">
+          <code>帮我写自动化脚本：
+1. 说明要处理的数据和逻辑
+2. 生成 SQL、Excel 公式、Power Query 脚本
+3. 建立指标口径字典，检查报表公式错误</code>
+          <button class="copy-btn">复制提问</button>
+        </div>
+        <div class="info-row">
+          <span><b>需准备</b>：数据处理需求</span>
+          <span><b>产出</b>：脚本 + 指标口径字典</span>
+        </div>
+        <div class="note">注意：脚本生成后请测试环境验证，再上生产。</div>
+      </div>
+
+      <div class="card">
+        <h3>财务知识库与问答</h3>
+        <p class="desc">建立财务知识库，回答制度流程问题。</p>
+        <div class="prompt-box">
+          <code>帮我建财务知识库：
+1. 上传制度、流程、历史问答
+2. 整理成标准作业指引和知识库
+3. 新员工可通过问答查询制度、流程和案例</code>
+          <button class="copy-btn">复制提问</button>
+        </div>
+        <div class="info-row">
+          <span><b>需准备</b>：制度/流程/历史问答</span>
+          <span><b>产出</b>：知识库 + 标准作业指引</span>
+        </div>
+        <div class="note">注意：知识库内容需定期更新，保持和现行制度一致。</div>
+      </div>
+    </section>
+
+    <!-- ============ 模块17 ============ -->
+    <section class="module" id="m17">
+      <div class="module-head">
+        <span class="num">模块 17</span>
+        <h2>财务BP与业务协同</h2>
+        <p class="lead">业务决策财务测算、会议纪要与复盘材料。</p>
+        <div class="source">无需连接器，提供业务方案、相关数据、会议记录即可处理。</div>
+      </div>
+
+      <div class="card">
+        <h3>业务决策财务测算</h3>
+        <p class="desc">评估折扣、账期、营销、招聘、定价的财务影响。</p>
+        <div class="prompt-box">
+          <code>帮我做业务决策测算：
+1. 提供业务方案（折扣/账期/营销/招聘/定价/新店）
+2. 评估对毛利、现金流、利润、盈亏平衡的影响
+3. 输出测算结果和建议</code>
+          <button class="copy-btn">复制提问</button>
+        </div>
+        <div class="info-row">
+          <span><b>需准备</b>：业务方案 + 相关数据</span>
+          <span><b>产出</b>：财务影响测算 + 建议</span>
+        </div>
+        <div class="note">注意：测算基于假设，关键变量我会标注并做敏感性。</div>
+      </div>
+
+      <div class="card">
+        <h3>会议纪要与复盘材料</h3>
+        <p class="desc">生成会议纪要，提取数字和待办，准备复盘。</p>
+        <div class="prompt-box">
+          <code>帮我整理会议和复盘：
+1. 提供会议记录/录音（或上传）
+2. 提取数字、承诺、待办事项
+3. 生成会议纪要和「关键数字、风险、建议」复盘材料</code>
+          <button class="copy-btn">复制提问</button>
+        </div>
+        <div class="info-row">
+          <span><b>需准备</b>：会议记录/录音</span>
+          <span><b>产出</b>：会议纪要 + 待办 + 复盘材料</span>
+        </div>
+        <div class="note">注意：录音转写如有错漏，关键数字请二次核对。</div>
+      </div>
+    </section>
+
+    <!-- ============ 模块18 ============ -->
+    <section class="module" id="m18">
+      <div class="module-head">
+        <span class="num">模块 18</span>
+        <h2>财务沟通与文字</h2>
+        <p class="lead">财务文案起草、翻译与多版本输出。</p>
+        <div class="source">无需连接器，提供文案类型和背景要点即可处理。</div>
+      </div>
+
+      <div class="card">
+        <h3>财务文案起草</h3>
+        <p class="desc">起草通知、邮件、函件、审计回复、税务说明。</p>
+        <div class="prompt-box">
+          <code>帮我起草财务文案：
+1. 说明类型（通知/邮件/函件/审计回复/税务说明/董事会回复）
+2. 提供背景和要点
+3. 生成初稿，并压缩成管理层摘要</code>
+          <button class="copy-btn">复制提问</button>
+        </div>
+        <div class="info-row">
+          <span><b>需准备</b>：文案类型 + 背景要点</span>
+          <span><b>产出</b>：文案初稿 + 摘要</span>
+        </div>
+        <div class="note">注意：对外函件措辞我会注意法律和审计风险。</div>
+      </div>
+
+      <div class="card">
+        <h3>翻译与多版本输出</h3>
+        <p class="desc">中英文翻译，统一口径，按对象出不同版本。</p>
+        <div class="prompt-box">
+          <code>帮我做翻译和多版本：
+1. 提供财务资料
+2. 中英文互译，统一报告口径
+3. 按对象生成不同版本（老板版/业务版/审计版/税务版）</code>
+          <button class="copy-btn">复制提问</button>
+        </div>
+        <div class="info-row">
+          <span><b>需准备</b>：财务资料 + 目标对象</span>
+          <span><b>产出</b>：翻译稿 + 多版本输出</span>
+        </div>
+        <div class="note">注意：专业术语我会保持一致，数字、币种、期间会逐一校对。</div>
+      </div>
+    </section>
+
+    <div class="footer">财务人AI速查手册 · 18 大模块 · 所有「提问模板」可直接复制使用</div>
+
+  </main>
+</div>
+
+<script>
+  (function () {
+    // 先给每个功能卡分配唯一 id（置顶/删除/侧边栏子目录都依赖）
+    document.querySelectorAll('section.module').forEach(function (sec) {
+      sec.querySelectorAll('.card').forEach(function (card, i) {
+        if (!card.id) card.id = sec.id + '-f' + i;
+      });
+    });
+
+    // ===== 置顶 / 删除功能（localStorage 持久化）=====
+    var DEL_KEY = 'del_cards_v1';
+    var PIN_KEY = 'pin_cards_v1';
+    var deleted = [];
+    var pinned = [];
+    try { deleted = JSON.parse(localStorage.getItem(DEL_KEY) || '[]'); } catch (e) {}
+    try { pinned = JSON.parse(localStorage.getItem(PIN_KEY) || '[]'); } catch (e) {}
+
+    // 应用删除
+    deleted.forEach(function (cid) {
+      var el = document.getElementById(cid);
+      if (el) el.remove();
+    });
+
+    // 应用置顶（reverse 遍历，最新置顶排最前）
+    pinned.slice().reverse().forEach(function (cid) {
+      var el = document.getElementById(cid);
+      if (el) {
+        var sec = el.closest('section.module');
+        var head = sec.querySelector('.module-head');
+        head.insertAdjacentElement('afterend', el);
+      }
+    });
+
+    // 给每个功能卡加「置顶 / 删除」按钮
+    document.querySelectorAll('.card').forEach(function (card) {
+      var cid = card.id;
+      if (!cid) return;
+      var tools = document.createElement('div');
+      tools.className = 'card-tools';
+      var pinBtn = document.createElement('button');
+      var delBtn = document.createElement('button');
+      delBtn.textContent = '删除';
+      delBtn.className = 'del';
+      tools.appendChild(pinBtn);
+      tools.appendChild(delBtn);
+      card.appendChild(tools);
+
+      function updatePinBtn() {
+        var isPinned = pinned.indexOf(cid) >= 0;
+        pinBtn.textContent = isPinned ? '取消置顶' : '置顶';
+        pinBtn.classList.toggle('pinned', isPinned);
+      }
+
+      pinBtn.addEventListener('click', function () {
+        var sec = card.closest('section.module');
+        var head = sec.querySelector('.module-head');
+        if (pinned.indexOf(cid) >= 0) {
+          pinned = pinned.filter(function (x) { return x !== cid; });
+          sec.appendChild(card);
+        } else {
+          head.insertAdjacentElement('afterend', card);
+          pinned.unshift(cid);
+        }
+        try { localStorage.setItem(PIN_KEY, JSON.stringify(pinned)); } catch (e) {}
+        updatePinBtn();
+      });
+
+      delBtn.addEventListener('click', function () {
+        if (!confirm('确定删除这个功能吗？删除后如需恢复，可清除浏览器记录。')) return;
+        deleted.push(cid);
+        try { localStorage.setItem(DEL_KEY, JSON.stringify(deleted)); } catch (e) {}
+        card.remove();
+        var sub = document.querySelector('#nav a.sub[href="#' + cid + '"]');
+        if (sub) sub.remove();
+      });
+
+      updatePinBtn();
+    });
+
+    // 恢复默认设置
+    document.getElementById('resetBtn').addEventListener('click', function () {
+      if (!confirm('确定恢复默认设置吗？将撤销所有置顶、删除和验证标记。')) return;
+      ['del_cards_v1', 'pin_cards_v1', 'verify_state_v1'].forEach(function (k) {
+        localStorage.removeItem(k);
+      });
+      location.reload();
+    });
+
+    // 一键复制
+    document.querySelectorAll('.copy-btn').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var code = btn.closest('.prompt-box').querySelector('code');
+        var text = code ? code.textContent : '';
+        function ok() {
+          btn.textContent = '已复制 ✓';
+          btn.classList.add('done');
+          setTimeout(function () { btn.textContent = '复制提问'; btn.classList.remove('done'); }, 1600);
+        }
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(text).then(ok).catch(function () { fallback(); });
+        } else { fallback(); }
+        function fallback() {
+          var ta = document.createElement('textarea');
+          ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+          document.body.appendChild(ta); ta.select();
+          try { document.execCommand('copy'); } catch (e) {}
+          document.body.removeChild(ta); ok();
+        }
+      });
+    });
+
+    // 已验证 / 未验证 切换（localStorage 持久化）
+    var VERIFY_KEY = 'verify_state_v1';
+    var verifyState = {};
+    try { verifyState = JSON.parse(localStorage.getItem(VERIFY_KEY) || '{}'); } catch (e) { verifyState = {}; }
+
+    document.querySelectorAll('.card').forEach(function (card) {
+      var h3 = card.querySelector('h3');
+      if (!h3) return;
+      var key = h3.textContent.trim();
+      var badge = document.createElement('span');
+      badge.className = 'verify-badge';
+      badge.innerHTML = '<span class="dot"></span><span class="txt"></span>';
+      h3.appendChild(badge);
+
+      function render() {
+        var v = !!verifyState[key];
+        badge.classList.toggle('verified', v);
+        badge.classList.toggle('unverified', !v);
+        badge.querySelector('.txt').textContent = v ? '已验证' : '未验证';
+      }
+      badge.addEventListener('click', function () {
+        verifyState[key] = !verifyState[key];
+        try { localStorage.setItem(VERIFY_KEY, JSON.stringify(verifyState)); } catch (e) {}
+        render();
+      });
+      render();
+    });
+
+    // 生成侧边栏子目录（每个模块下展开功能点）
+    document.querySelectorAll('section.module').forEach(function (sec) {
+      var link = document.querySelector('#nav a[href="#' + sec.id + '"]');
+      if (!link) return;
+      var cards = sec.querySelectorAll('.card h3');
+      var last = link;
+      cards.forEach(function (h3, i) {
+        var fid = sec.id + '-f' + i;
+        h3.closest('.card').id = fid;
+        var sub = document.createElement('a');
+        sub.className = 'sub';
+        sub.href = '#' + fid;
+        sub.textContent = h3.textContent.replace(/未验证|已验证/g, '').trim();
+        last.insertAdjacentElement('afterend', sub);
+        last = sub;
+      });
+    });
+
+    // 侧边栏高亮当前模块（滚动监听）
+    var links = Array.prototype.slice.call(document.querySelectorAll('#nav a:not(.sub)'));
+    var sections = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    function onScroll() {
+      var pos = window.scrollY + 80;
+      var current = sections[0];
+      sections.forEach(function (sec) { if (sec && sec.offsetTop <= pos) current = sec; });
+      links.forEach(function (a) {
+        a.classList.remove('active');
+        if (current && a.getAttribute('href') === '#' + current.id) a.classList.add('active');
+      });
+    }
+    window.addEventListener('scroll', onScroll);
+    onScroll();
+  })();
+</script>
+</body>
+</html>
