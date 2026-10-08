@@ -250,9 +250,6 @@
   .pinned-empty { padding: 14px; border: 1px dashed #bfd5ef; border-radius: 8px; color: var(--text-sub); background: #fff; font-size: 13px; }
   .pinned-jump { margin: 0 0 12px; padding: 0; border: 0; background: transparent; color: var(--primary); font-size: 12px; cursor: pointer; }
   .pinned-jump:hover { color: var(--primary-dark); text-decoration: underline; }
-  .follow-note { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 12px; margin: 30px 0 0; padding: 16px 20px; border-left: 4px solid var(--primary); background: #e9f2ff; border-radius: 8px; color: var(--primary-dark); }
-  .follow-note strong { font-size: 14px; }
-  .follow-note span { color: var(--text-sub); font-size: 13px; }
   .verify-badge {
     display: inline-flex; align-items: center; gap: 6px;
     font-size: 12px; font-weight: 700; padding: 3px 12px;
@@ -325,7 +322,6 @@
       <a href="#m7">16. PPT 汇报</a>
       <a href="#m17">17. 财务BP与业务协同</a>
       <a href="#m18">18. 财务沟通与文字</a>
-      <a href="#skills">19. 财务 AI Skills</a>
     </nav>
   </aside>
 
@@ -333,7 +329,7 @@
 
     <div class="page-header">
       <h1>财务人AI速查手册</h1>
-      <p>18 个财务业务模块 · 72 个场景模板 · 5 个财务 AI Skills。按场景复制提问模板，也可以用 Agent Skill 组织更完整的专业工作流。</p>
+      <p>18 个主题模块 · 72 个功能卡片 · 每个功能点配好「可直接复制的提问模板」。点卡片右侧的「复制提问」按钮，粘贴到对话框里按你的实际情况改几个字就能用。</p>
     </div>
 
     <div class="disclaimer">
@@ -1788,88 +1784,7 @@ GDP、CPI、PPI、社融、M2、LPR/利率、人民币汇率
       </div>
     </section>
 
-    <!-- ============ 财务 AI Skills ============ -->
-    <section class="module" id="skills">
-      <div class="module-head">
-        <span class="num">模块 19</span>
-        <h2>财务 AI Skills</h2>
-        <p class="lead">把财务任务变成可重复的 Agent 工作流：从资料保护、尽调分析，到表格建模与 Excel 协作。</p>
-        <div class="source"><b>使用说明：</b>提示词可以直接复制给支持文件分析的 AI。只有已安装对应 Skill 的 Agent 才能按 Skill 的完整规则执行；单独复制提示词不等于安装 Skill，也不能替代本地脱敏程序或 Excel 连接器。</div>
-      </div>
-
-      <div class="card">
-        <h3>尽调资料隐私扫描与脱敏</h3>
-        <p class="desc">提交尽调资料前，识别个人身份、银行账户、税务编号、签章和敏感交易对手信息，并生成脱敏副本。</p>
-        <div class="prompt-box">
-          <code>请调用 financial-dd-data-redaction Skill（如果当前 Agent 已安装）。先对我指定的尽调文件做隐私扫描，不要在回复、日志或提示词中展示命中的原始敏感值；按文件、位置、类别和建议动作汇总。保留原文件，只生成脱敏副本；明确标出未能扫描的格式、OCR 是否可用，以及仍未清除的高风险项。未经我确认，不要把原始资料上传给外部模型或服务。</code>
-          <button class="copy-btn">复制提问</button>
-        </div>
-        <div class="info-row">
-          <span><b>适用</b>：并购、投资、审计资料外发前检查</span>
-          <span><b>需准备</b>：待检查文件及允许处理的目录</span>
-        </div>
-        <div class="note">隐私门禁 Skill 使用本地扫描工具；只复制提示词不能保证文件已被真正脱敏。发送前请人工抽查脱敏副本。</div>
-      </div>
-
-      <div class="card">
-        <h3>中国企业财务尽调工作台</h3>
-        <p class="desc">梳理收入回款、毛利、营运资金、债务、关联方、税务和合同证据，输出风险分级与补充资料清单。</p>
-        <div class="prompt-box">
-          <code>请调用 financial-dd-workbench Skill（如果当前 Agent 已安装），对我提供的中国企业财务尽调资料开展分析。先盘点资料并确认公司、报告期间、币种和决策问题；建立“主张-证据-来源-核验状态-缺口-影响”矩阵；重点检查收入与回款、毛利、应收存货应付、现金债务、关联方和税务。将风险分为 P0/P1/P2，列明证据定位、影响和待补资料。区分已确认事实、计算事实、管理层陈述与分析判断，不编造数据，并标明审计、法律、税务专业复核边界。</code>
-          <button class="copy-btn">复制提问</button>
-        </div>
-        <div class="info-row">
-          <span><b>适用</b>：初步/全面财务尽调、投后复盘</span>
-          <span><b>产出</b>：证据矩阵 + 风险清单 + 尽调报告</span>
-        </div>
-        <div class="note">Skill 可按证据定位生成尽调报告；不同 Agent 对 Excel、PDF、图片和报告文件的支持能力不同。</div>
-      </div>
-
-      <div class="card">
-        <h3>私募股权与并购投资尽调</h3>
-        <p class="desc">把 BP、CIM、管理层访谈、数据室、估值和交易条款整合为证据驱动的投委会决策材料。</p>
-        <div class="prompt-box">
-          <code>请调用 private-equity-investment-dd Skill（如果当前 Agent 已安装），协助分析我提供的投资项目资料。先识别交易类型、决策阶段、资料范围和关键投资假设，再建立证据矩阵与红旗台账，整合商业、行业、财务、法律税务、团队、估值回报、退出和交易条款分析。输出投资判断、关键假设、证据缺口、访谈/资料请求及交易影响；严格区分事实、管理层陈述和判断，不把未知写成确定结论。</code>
-          <button class="copy-btn">复制提问</button>
-        </div>
-        <div class="info-row">
-          <span><b>适用</b>：PE/VC、并购、战略投资、Pre-IPO</span>
-          <span><b>产出</b>：投资尽调报告 / IC 决策包</span>
-        </div>
-        <div class="note">用于内部项目分析，不构成面向公众的证券投资建议，也不替代投委会或专业机构意见。</div>
-      </div>
-
-      <div class="card">
-        <h3>财务表格分析与模型制作</h3>
-        <p class="desc">分析 Excel/CSV，建立预算、预测、估值和经营分析模型，并检查公式、口径和勾稽关系。</p>
-        <div class="prompt-box">
-          <code>请调用 Spreadsheets Skill（如果当前 Agent 已安装），处理我上传的工作簿。先说明工作表、字段和数据期间；保留原始数据，标出单位、口径和假设；按我的目标完成分析或模型，并检查公式、总分勾稽、异常值和缺失数据。交付时说明关键公式、结果限制和需要我确认的假设，不要把未经核验的数字写成事实。我的目标是：【填写分析/模型目标】。</code>
-          <button class="copy-btn">复制提问</button>
-        </div>
-        <div class="info-row">
-          <span><b>适用</b>：预算预测、经营分析、财务模型、数据清洗</span>
-          <span><b>需准备</b>：Excel/CSV + 目标口径</span>
-        </div>
-        <div class="note">通用表格 Skill 适用于上传文件；实时操作已打开的 Microsoft Excel 工作簿需要另外具备 Excel 实时连接能力。</div>
-      </div>
-
-      <div class="card">
-        <h3>已打开 Excel 工作簿实时协作</h3>
-        <p class="desc">在已连接的 Microsoft Excel 会话中读取、分析或编辑当前工作簿，不是处理普通上传文件的替代方案。</p>
-        <div class="prompt-box">
-          <code>请调用 excel-live-control Skill（如果当前 Agent 已安装且实时 Excel 会话已连接）。先确认 Microsoft Excel 工作簿和工作表，再检查我指定的区域：【工作表/范围】。目标：【填写分析或编辑任务】。先说明你准备读取或修改的内容；修改后核验公式、格式和结果。如果当前没有连接的 Excel 工作簿，请明确告知我，并让我改为上传文件，不要声称已经读取或修改了本地工作簿。</code>
-          <button class="copy-btn">复制提问</button>
-        </div>
-        <div class="info-row">
-          <span><b>适用</b>：对打开中的 Microsoft Excel 工作簿进行协作</span>
-          <span><b>前提</b>：Excel 与对应 AI 插件/实时会话已连接</span>
-        </div>
-        <div class="note">这是特定运行环境能力；如果对方的 Agent 没有 Excel 实时连接，需上传工作簿并使用表格分析 Skill。</div>
-      </div>
-    </section>
-
-    <div class="follow-note"><strong>想继续把 AI 用进财务工作？</strong><span>关注分享本手册的账号，获取后续财务场景模板、Agent Skill 与实操案例。</span></div>
-    <div class="footer">财务人AI速查手册 · 18 个财务业务模块 · 72 个场景模板 · 5 个财务 AI Skills</div>
+    <div class="footer">财务人AI速查手册 · 18 个主题模块 · 72 个功能卡片 · 所有「提问模板」可直接复制使用</div>
 
   </main>
 </div>
@@ -1884,7 +1799,7 @@ GDP、CPI、PPI、社融、M2、LPR/利率、人民币汇率
     });
 
     // 按财务工作流重排模块，并把跨模块卡片归回业务归属。
-    var sectionOrder = ['overview', 'm1', 'm10', 'm11', 'm2', 'm13', 'm14', 'm4', 'm3', 'm12', 'm15', 'm5', 'm9', 'm6', 'm16', 'm8', 'm7', 'm17', 'm18', 'skills'];
+    var sectionOrder = ['overview', 'm1', 'm10', 'm11', 'm2', 'm13', 'm14', 'm4', 'm3', 'm12', 'm15', 'm5', 'm9', 'm6', 'm16', 'm8', 'm7', 'm17', 'm18'];
     var main = document.querySelector('.main');
     sectionOrder.forEach(function (sid, i) {
       var sec = document.getElementById(sid);
